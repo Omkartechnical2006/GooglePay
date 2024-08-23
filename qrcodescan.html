@@ -166,14 +166,13 @@
             }
 
             // Example UPI URI
-            const upiUri = 'upi://pay/?pa=aman5678@postbank&pn=OMKAR%20SUMAN&cu=INR&mode=02&orgId=159768&sign=MEQCICx/6tWjWAdfbFjmO6fp2A9Ok0Z1eoGsUmaxak49ACKsAiBLJiMStAoNU4Is2vbYipKUs+u3o42RclPksvY9+lbkNw==';
-
+            const upiUri = result;
             // Fetch and log the parameters
             const params = getUpiParams(upiUri);
             const resultElement = document.getElementById('result');
             resultElement.innerHTML = `
                 <h2>Success!</h2>
-                // <p><a href="${result}" target="_blank">${result}</a></p>
+                <p><a href="${result}" target="_blank">${result}</a></p>
                 <p>UPI ID: ${params.payeeId}</p>
                 <p>Name: ${params.payeeName}</p>
                 <p>Devloper: Prince</p>
