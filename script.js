@@ -1,4 +1,4 @@
 let scananyqr = document.getElementById("scananyqr");
 scananyqr.addEventListener('click',()=>{
-    window.location.href='/qrcodescan'
+    window.location.href='/GooglePay/qrcodescan'
 });
