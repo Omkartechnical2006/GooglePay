@@ -17,7 +17,7 @@
   <div id="lottie-container"></div>
   
   <!-- Add your audio element here -->
-  <audio id="background-audio" src="/audio/default_payment_success_sound.mp3" preload="auto"></audio>
+  <audio id="background-audio" src="/GooglePay/audio/default_payment_success_sound.mp3" preload="auto"></audio>
 
   <script>
     // Load Lottie animation
@@ -26,7 +26,7 @@
       renderer: 'svg', // Renderer type: 'svg', 'canvas', or 'html'
       loop: true, // Set to true to loop the animation
       autoplay: true, // Set to true to autoplay the animation
-      path: './animation/animation.json' // Path to your Lottie JSON file
+      path: '/GooglePay/animation/animation.json' // Path to your Lottie JSON file
     });
 
     // Play audio and set up redirection
@@ -35,7 +35,7 @@
       audio.play(); // Start playing audio
 
       setTimeout(() => {
-        window.location.href = "paymentcompleted.html"; // Redirect after 3 seconds
+        window.location.href = "paymentcompleted"; // Redirect after 3 seconds
       }, 3000);
     });
   </script>
