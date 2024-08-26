@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Screen</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            max-width: 400px;
+            width: 100%;
+            height: 95%;
+            /* Set height to 100% of viewport height */
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            padding-top: 5vh;
+            /* 5% gap from the top */
+        }
+
+        .profile-pic {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .info {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .info h2 {
+            margin: 10px 0;
+            font-size: 20px;
+        }
+
+        .info p {
+            margin: 5px 0;
+            color: gray;
+        }
+
+        .amount-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .rupee-sign {
+            font-size: 36px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .amount-input {
+            font-size: 36px;
+            font-weight: bold;
+            border: none;
+            border-bottom: 2px solid #ddd;
+            width: 100%;
+            max-width: 200px;
+            text-align: center;
+            padding: 10px;
+            outline: none;
+            -moz-appearance: textfield;
+            /* Hide spinner for Firefox */
+        }
+
+        /* Hide arrows in input number */
+        .amount-input::-webkit-outer-spin-button,
+        .amount-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Textarea box below the amount input */
+        .additional-box {
+            width: 80%;
+            max-width: 200px;
+            /* Adjust width if necessary */
+            height: 35px;
+            /* Fixed height to match the previous design */
+            margin-top: 20px;
+            padding: 5px;
+            /* Reduce padding to fit height */
+            background-color: #f1f3f4;
+            border-radius: 8px;
+            color: #757575;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            /* Border for better visibility */
+            resize: none;
+            /* Disable resizing */
+            box-sizing: border-box;
+            /* Include padding and border in element's total width and height */
+            overflow: hidden;
+            /* Hide scrollbars and overflow */
+            text-align: left;
+            /* Align text to the left */
+            display: flex;
+            /* Use flex to align items */
+            align-items: center;
+            /* Center items vertically */
+            padding-left: 10px;
+            /* Ensure text has enough space from the left edge */
+            padding-right: 10px;
+            /* Ensure text has enough space from the right edge */
+        }
+
+        .send-button {
+            position: absolute;
+            bottom: 15vh;
+            /* 5% of the viewport height from the bottom */
+            right: 25px;
+            background-color: #007bff;
+            color: white;
+            padding: 15px;
+            border-radius: 50%;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .send-button:active {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <img src="https://via.placeholder.com/80" alt="Profile" class="profile-pic">
+        <div class="info">
+            <h2 id="upiName"></h2>
+            <p id="upiId"></p>
+        </div>
+        <div class="amount-section">
+            <span class="rupee-sign">₹</span>
+            <input type="number" class="amount-input" placeholder="0" id="amountInput">
+        </div>
+        <!-- Textarea box below the amount input -->
+        <textarea class="additional-box" placeholder="Grocery" style="text-align: center;"></textarea>
+        <button class="send-button" onclick="sendAmount()">&#10140;</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const upiId = getCookie("upiId");
+            const Name = getCookie("name");
+            document.getElementById("upiName").innerText=Name;
+            document.getElementById("upiId").innerText=upiId;
+        });
+           function sendAmount() {
+            const amount = document.getElementById('amountInput').value;
+            if (amount) {
+                alert(`Sending ₹${amount}`);
+                setTimeout(function () {
+                    window.location.href = '../animation'; // Replace with the URL you want to redirect to
+                }, 1500);
+            } else {
+                alert("Please enter an amount.");
+            }
+        }
+        function getCookie(name) {
+            const nameEQ = name + "=";
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                let cookie = cookies[i];
+                while (cookie.charAt(0) === ' ') cookie = cookie.substring(1);
+                if (cookie.indexOf(nameEQ) === 0) return cookie.substring(nameEQ.length, cookie.length);
+            }
+            return null;
+        }
+    </script>
+</body>
+
+</html>

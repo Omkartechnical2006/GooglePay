@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lottie Animation Example</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.9.6/lottie.min.js"></script>
+  <style>
+    #lottie-container {
+      width: 300px;
+      height: 300px;
+      margin: 50px auto; /* Center the animation */
+    }
+  </style>
+</head>
+<body>
+  <div id="lottie-container"></div>
+  
+  <!-- Add your audio element here -->
+  <audio id="background-audio" src="/audio/default_payment_success_sound.mp3" preload="auto"></audio>
+
+  <script>
+    // Load Lottie animation
+    lottie.loadAnimation({
+      container: document.getElementById('lottie-container'), // The container element
+      renderer: 'svg', // Renderer type: 'svg', 'canvas', or 'html'
+      loop: true, // Set to true to loop the animation
+      autoplay: true, // Set to true to autoplay the animation
+      path: './animation/animation.json' // Path to your Lottie JSON file
+    });
+
+    // Play audio and set up redirection
+    document.addEventListener('DOMContentLoaded', () => {
+      const audio = document.getElementById('background-audio');
+      audio.play(); // Start playing audio
+
+      setTimeout(() => {
+        window.location.href = "paymentcompleted.html"; // Redirect after 3 seconds
+      }, 3000);
+    });
+  </script>
+</body>
+</html>

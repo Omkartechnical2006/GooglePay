@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Scanner</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: black;
+            position: relative;
+        }
+
+        main {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            /* Positioning main absolutely to fill the container */
+            top: 0;
+            left: 0;
+            z-index: 2;
+            /* Ensure the QR scanner is above the video feed */
+        }
+
+        #reader {
+            width: 300px;
+            height: 300px;
+            position: relative;
+            border-radius: 20px;
+            border: 2px solid white;
+            /* Border around the scanner */
+        }
+
+        .corner {
+            width: 50px;
+            height: 50px;
+            position: absolute;
+            border: 5px solid transparent;
+        }
+
+        .corner.top-left {
+            border-left-color: red;
+            border-top-color: red;
+            top: 0;
+            left: 0;
+        }
+
+        .corner.top-right {
+            border-right-color: yellow;
+            border-top-color: yellow;
+            top: 0;
+            right: 0;
+        }
+
+        .corner.bottom-left {
+            border-left-color: blue;
+            border-bottom-color: blue;
+            bottom: 0;
+            left: 0;
+        }
+
+        .corner.bottom-right {
+            border-right-color: green;
+            border-bottom-color: green;
+            bottom: 0;
+            right: 0;
+        }
+
+        .overlay-text {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            text-align: center;
+            color: white;
+            font-size: 1rem;
+            z-index: 3;
+            /* Ensure overlay text is above other content */
+        }
+
+        .upload-button {
+            position: absolute;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 10px 20px;
+            border-radius: 20px;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            border: 1px solid white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 3;
+            /* Ensure button is above other content */
+        }
+
+        .upload-button img {
+            width: 20px;
+        }
+
+        #file-input {
+            display: none;
+        }
+
+        /* Full page video background with lower visibility */
+        #camera-feed {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.3;
+            /* Lower visibility for the camera feed */
+            z-index: 1;
+            /* Ensure camera feed is below other content */
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.4/html5-qrcode.min.js"
+        integrity="sha512-k/KAe4Yff9EUdYI5/IAHlwUswqeipP+Cp5qnrsUjTPCgl51La2/JhyyjNciztD7mWNKLSXci48m7cctATKfLlQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+
+<body data-rsssl=1>
+    <video id="camera-feed" autoplay></video> <!-- Full page camera feed -->
+
+    <main>
+        <div id="reader">
+            <div class="corner top-left"></div>
+            <div class="corner top-right"></div>
+            <div class="corner bottom-left"></div>
+            <div class="corner bottom-right"></div>
+        </div>
+        <label class="upload-button" for="file-input">
+            <img src="https://img.icons8.com/ios-glyphs/30/ffffff/gallery.png" alt="Gallery Icon" /> Upload from gallery
+        </label>
+        <input type="file" id="file-input" accept="image/*" />
+        <div class="overlay-text">Scan any QR code to pay</div>
+    </main>
+
+    <script>
+        const cameraFeed = document.getElementById('camera-feed');
+        
+        //Delete previous cookie if payment is initiated within 5 minutes.....
+        function eraseCookie(name) {
+            document.cookie = name + '=; Max-Age=-99999999; path=/';
+        }
+        eraseCookie("upiId");
+        eraseCookie("name");
+
+        // Function to set up the camera feed
+        function startCamera() {
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+                .then(stream => {
+                    cameraFeed.srcObject = stream;
+                })
+                .catch(error => {
+                    console.error('Error accessing camera:', error);
+                });
+        }
+
+        startCamera(); // Start camera feed
+
+        const scanner = new Html5QrcodeScanner('reader', {
+            fps: 20,
+            qrbox: { width: 250, height: 250 }, // QR code scanning area
+            rememberLastUsedCamera: true,
+            facingMode: { exact: "environment" }, // Use back camera by default
+            disableFlip: true, // Do not flip the image
+        }, false); // Disable UI controls
+
+        scanner.render(success, error);
+
+        function success(result) {
+            // Function to parse the UPI URI and extract parameters
+            function getUpiParams(uri) {
+                // Create a URL object
+                const url = new URL(uri);
+
+                // Extract query parameters
+                const params = new URLSearchParams(url.search);
+
+                // Get payee ID and name
+                const payeeId = params.get('pa');
+                const payeeName = params.get('pn');
+
+                return {
+                    payeeId: payeeId,
+                    payeeName: payeeName
+                };
+            }
+
+            // Example UPI URI
+            const upiUri = result;
+            // Fetch and log the parameters
+            const params = getUpiParams(upiUri);
+            setCookie("upiId", params.payeeId, 5);
+            setCookie("name", params.payeeName, 5);
+            window.location.href = "../moneyask.html"
+        }
+
+        function error(err) {
+            console.error(err);
+        }
+
+        // Handle file input (gallery upload)
+        document.getElementById('file-input').addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const html5QrCode = new Html5Qrcode("reader");
+            html5QrCode.scanFile(file, true)
+                .then(decodedText => {
+                    success(decodedText);
+                })
+                .catch(errorMessage => {
+                    error(errorMessage);
+                });
+        });
+        // Function to set cookie 
+        function setCookie(name, value, minutes) {
+            let expires = "";
+            if (minutes) {
+                const date = new Date();
+                date.setTime(date.getTime() + (minutes * 60 * 1000)); // Convert minutes to milliseconds
+                expires = "; expires=" + date.toUTCString();
+            }
+            document.cookie = name + "=" + (value || "") + expires + "; path=/";
+        }
+    </script>
+</body>
+
+</html>
