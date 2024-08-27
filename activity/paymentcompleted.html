@@ -151,8 +151,8 @@
         <div class="payment-details">
             <p class="paid-to">Paid to <span id="upiName">Paytm</span></p>
             <p class="upi-id">UPI ID: <span id="upiId"></span></p>
-            <p class="date-time">25 August 2024, 4:41 pm</p>
-            <p class="transaction-id">UPI transaction ID: 460455751702</p>
+            <p class="date-time"><span id="dateTime"></span></p>
+            <p class="transaction-id">UPI transaction ID: <span id="transactionId"></span></p>
         </div>
         <div class="notification">
             <div class="notification-content">
@@ -186,12 +186,51 @@
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const upiId = getCookie("upiId");
             const Name = getCookie("name");
-            document.getElementById("upiName").innerText=Name;
-            document.getElementById("upiId").innerText=upiId;
+            document.getElementById("upiName").innerText = Name;
+            document.getElementById("upiId").innerText = upiId;
+
+            // add random transaction id 
+            function generateRandomNumber() {
+                const min = 100000000000; 
+                const max = 999999999999;
+                return Math.floor(Math.random() * (max - min + 1)) + min;
+            }
+            const randomNumber = generateRandomNumber();
+            document.getElementById("transactionId").innerText=randomNumber;
         });
+
+        //add date time of the payment time
+        document.getElementById("dateTime").innerText=formatDateTime();
+        function formatDateTime() {
+    const now = new Date();
+    
+    // Get the day, month, and year
+    const day = now.getDate();
+    const month = now.toLocaleString('default', { month: 'long' });
+    const year = now.getFullYear();
+    
+    // Get the hours and minutes
+    let hours = now.getHours();
+    const minutes = now.getMinutes();
+    
+    // Convert hours to 12-hour format and determine AM/PM
+    const amPm = hours >= 12 ? 'pm' : 'am';
+    hours = hours % 12 || 12;
+    
+    // Format minutes to always be two digits
+    const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+    
+    // Construct the formatted date and time string
+    const formattedDateTime = `${day} ${month} ${year}, ${hours}:${formattedMinutes} ${amPm}`;
+    
+    return formattedDateTime;
+}
+
+
+        
         // script.js
         document.querySelector('.close-btn').addEventListener('click', function () {
             document.querySelector('.notification').style.display = 'none';
@@ -208,7 +247,7 @@
 
                 //let's fetch the username by qr
                 const username = document.getElementById("upiName").innerText;
-                
+
                 // Create a link element to download the image
                 const link = document.createElement('a');
                 link.href = dataURL;
