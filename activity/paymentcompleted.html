@@ -20,6 +20,7 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
+            overflow: hidden;
         }
 
         .container {
@@ -27,13 +28,24 @@
             width: 350px;
             height: 90%;
             padding: 20px;
-            /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); */
             border-radius: 10px;
-            /* background-color: #121212; */
+            display: flex;
+            flex-direction: column;
+            
         }
 
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: auto;
+            /* Push buttons to the bottom */
+            margin-bottom: 15px;
+            /* Gap from the bottom */
+        }
+
+
         .success-icon {
-            margin-bottom: 10vh;
+            margin-bottom: 3vh;
         }
 
         .payment-details p {
@@ -109,12 +121,6 @@
             align-self: flex-start;
         }
 
-        .buttons {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-        }
-
         .buttons button {
             flex: 1;
             margin: 0 5px;
@@ -140,7 +146,7 @@
 <body>
     <div class="container" id="contentToCapture">
         <div class="success-icon">
-            <img src="../images/tick.png" alt="paymenticon" width="35%">
+            <img src="../images/tick.png" alt="paymenticon" width="38%">
             <!-- <svg xmlns="http://www.w3.org/2000/svg" width="130" height="130" viewBox="0 0 24 24" fill="none">
                 <circle cx="12" cy="12" r="10" fill="#00BFFF" />
                 <path d="M9 12.5l2 2.5 4-5" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"
@@ -195,43 +201,43 @@
 
             // add random transaction id 
             function generateRandomNumber() {
-                const min = 100000000000; 
+                const min = 100000000000;
                 const max = 999999999999;
                 return Math.floor(Math.random() * (max - min + 1)) + min;
             }
             const randomNumber = generateRandomNumber();
-            document.getElementById("transactionId").innerText=randomNumber;
+            document.getElementById("transactionId").innerText = randomNumber;
         });
 
         //add date time of the payment time
-        document.getElementById("dateTime").innerText=formatDateTime();
+        document.getElementById("dateTime").innerText = formatDateTime();
         function formatDateTime() {
-    const now = new Date();
-    
-    // Get the day, month, and year
-    const day = now.getDate();
-    const month = now.toLocaleString('default', { month: 'long' });
-    const year = now.getFullYear();
-    
-    // Get the hours and minutes
-    let hours = now.getHours();
-    const minutes = now.getMinutes();
-    
-    // Convert hours to 12-hour format and determine AM/PM
-    const amPm = hours >= 12 ? 'pm' : 'am';
-    hours = hours % 12 || 12;
-    
-    // Format minutes to always be two digits
-    const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
-    
-    // Construct the formatted date and time string
-    const formattedDateTime = `${day} ${month} ${year}, ${hours}:${formattedMinutes} ${amPm}`;
-    
-    return formattedDateTime;
-}
+            const now = new Date();
+
+            // Get the day, month, and year
+            const day = now.getDate();
+            const month = now.toLocaleString('default', { month: 'long' });
+            const year = now.getFullYear();
+
+            // Get the hours and minutes
+            let hours = now.getHours();
+            const minutes = now.getMinutes();
+
+            // Convert hours to 12-hour format and determine AM/PM
+            const amPm = hours >= 12 ? 'pm' : 'am';
+            hours = hours % 12 || 12;
+
+            // Format minutes to always be two digits
+            const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+
+            // Construct the formatted date and time string
+            const formattedDateTime = `${day} ${month} ${year}, ${hours}:${formattedMinutes} ${amPm}`;
+
+            return formattedDateTime;
+        }
 
 
-        
+
         // script.js
         document.querySelector('.close-btn').addEventListener('click', function () {
             document.querySelector('.notification').style.display = 'none';
