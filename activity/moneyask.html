@@ -33,10 +33,11 @@
             /* 5% gap from the top */
         }
 
-        .profile-pic {
+        .profile {
             width: 80px;
             height: 80px;
             border-radius: 50%;
+            background-color: rgb(225, 194, 136);
             object-fit: cover;
         }
 
@@ -148,7 +149,10 @@
 
 <body>
     <div class="container">
-        <img src="https://via.placeholder.com/80" alt="Profile" class="profile-pic">
+        <!-- <img src="https://via.placeholder.com/80" alt="Profile" class="profile-pic"> -->
+        <div class="profile" style="display: flex;justify-content: center;align-items: center;font-size: xx-large;">
+            <p id="userFirstName" style="color: white;"></p>
+        </div>
         <div class="info">
             <h2 id="upiName"></h2>
             <p id="upiId"></p>
@@ -163,18 +167,23 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const upiId = getCookie("upiId");
             const Name = getCookie("name");
-            document.getElementById("upiName").innerText=Name;
-            document.getElementById("upiId").innerText=upiId;
+            document.getElementById("upiName").innerText = Name;
+            document.getElementById("upiId").innerText = upiId;
+            const name = Name.trim();
+            const firstName = name.split(' ')[0];
+            const firstLetter = firstName.charAt(0);
+            document.getElementById("userFirstName").textContent=firstLetter;
+
         });
-           function sendAmount() {
+        function sendAmount() {
             const amount = document.getElementById('amountInput').value;
             if (amount) {
                 alert(`Sending ₹${amount}`);
                 setTimeout(function () {
-                    window.location.href = 'animation'; // Replace with the URL you want to redirect to
+                    window.location.href = 'animation.html'; // Replace with the URL you want to redirect to
                 }, 1500);
             } else {
                 alert("Please enter an amount.");
