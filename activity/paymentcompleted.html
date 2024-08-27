@@ -4,8 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Google Pay</title>
-    <link rel="icon" href="/GooglePay/images/app_icon.png" type="image/x-icon">
+    <title>Payment Confirmation</title>
     <style>
         /* styles.css */
         body,
@@ -155,7 +154,7 @@
             </svg> -->
 
         </div>
-        <p class="amount">₹29.00</p>
+        <p class="amount">₹<span id="amount"></span>.00</p>
         <div class="payment-details">
             <p class="paid-to">Paid to <span id="upiName">Paytm</span></p>
             <p class="upi-id">UPI ID: <span id="upiId"></span></p>
@@ -199,6 +198,9 @@
             const Name = getCookie("name");
             document.getElementById("upiName").innerText = Name;
             document.getElementById("upiId").innerText = upiId;
+
+            //set amount
+            document.getElementById("amount").innerText=localStorage.getItem("amountInput");
 
             // add random transaction id 
             function generateRandomNumber() {
