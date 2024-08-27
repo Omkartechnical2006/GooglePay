@@ -178,11 +178,12 @@
             document.getElementById("userFirstName").textContent=firstLetter;
 
         });
-        function sendAmount() {
+       function sendAmount() {
             const amount = document.getElementById('amountInput').value;
             if (amount) {
                 alert(`Sending ₹${amount}`);
                 setTimeout(function () {
+                localStorage.setItem("amountInput",document.getElementById("amountInput").value);
                     window.location.href = 'animation.html'; // Replace with the URL you want to redirect to
                 }, 1500);
             } else {
