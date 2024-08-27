@@ -3,281 +3,245 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment Confirmation</title>
+    <title>QR Code Scanner</title>
     <style>
-        /* styles.css */
-        body,
-        html {
+        * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            /* background-color: #000; */
-            font-family: Arial, sans-serif;
-            /* color: #fff; */
-            color: #000;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: black;
+            position: relative;
+        }
+
+        main {
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            overflow: hidden;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            /* Positioning main absolutely to fill the container */
+            top: 0;
+            left: 0;
+            z-index: 2;
+            /* Ensure the QR scanner is above the video feed */
         }
 
-        .container {
+        #reader {
+            width: 300px;
+            height: 300px;
+            position: relative;
+            border-radius: 20px;
+            border: 2px solid white;
+            /* Border around the scanner */
+        }
+
+        .corner {
+            width: 50px;
+            height: 50px;
+            position: absolute;
+            border: 5px solid transparent;
+        }
+
+        .corner.top-left {
+            border-left-color: red;
+            border-top-color: red;
+            top: 0;
+            left: 0;
+        }
+
+        .corner.top-right {
+            border-right-color: yellow;
+            border-top-color: yellow;
+            top: 0;
+            right: 0;
+        }
+
+        .corner.bottom-left {
+            border-left-color: blue;
+            border-bottom-color: blue;
+            bottom: 0;
+            left: 0;
+        }
+
+        .corner.bottom-right {
+            border-right-color: green;
+            border-bottom-color: green;
+            bottom: 0;
+            right: 0;
+        }
+
+        .overlay-text {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
             text-align: center;
-            width: 350px;
-            height: 90%;
-            padding: 20px;
-            border-radius: 10px;
-            display: flex;
-            flex-direction: column;
-            
+            color: white;
+            font-size: 1rem;
+            z-index: 3;
+            /* Ensure overlay text is above other content */
         }
 
-        .buttons {
-            display: flex;
-            justify-content: space-between;
-            margin-top: auto;
-            /* Push buttons to the bottom */
-            margin-bottom: 15px;
-            /* Gap from the bottom */
-        }
-
-
-        .success-icon {
-            margin-bottom: 3vh;
-        }
-
-        .payment-details p {
-            margin: 5px 0;
-        }
-
-        .amount {
-            font-size: 32px;
-            font-weight: bold;
-
-        }
-
-        .paid-to,
-        .date-time {
-            font-size: large;
-            font-weight: bold;
-        }
-
-        /* Notification Styling */
-        .notification {
-            border: 2px solid rgba(87, 51, 51, 0.2);
-            padding: 15px;
-            margin-top: 20px;
-            border-radius: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .notification-content {
+        .upload-button {
+            position: absolute;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 10px 20px;
+            border-radius: 20px;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            border: 1px solid white;
             display: flex;
             align-items: center;
+            gap: 8px;
+            z-index: 3;
+            /* Ensure button is above other content */
         }
 
-        .notification-content svg {
-            margin-right: 15px;
-            align-self: flex-start;
+        .upload-button img {
+            width: 20px;
         }
 
-        .notification-title {
-            font-weight: bold;
-            margin: 0;
+        #file-input {
+            display: none;
         }
 
-        .notification-text {
-            /* background-color: red; */
-            text-align: justify;
-        }
-
-        .notification-subtitle {
-            margin: 0;
-            font-size: 0.9em;
-            /* color: rgba(255, 255, 255, 0.7); */
-
-        }
-
-        .add-balance {
-            display: block;
-            margin-top: 5px;
-            color: #1e90ff;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        .close-btn {
-            background: none;
-            border: none;
-            color: black;
-            font-weight: bolder;
-            font-size: 18px;
-            cursor: pointer;
-            margin-left: 15px;
-            align-self: flex-start;
-        }
-
-        .buttons button {
-            flex: 1;
-            margin: 0 5px;
-            padding: 10px;
-            border: none;
-            border-radius: 55px;
-            cursor: pointer;
-        }
-
-        .share-btn {
-            background-color: inherit;
-            border: 1px solid rgba(77, 53, 53, 0.2) !important;
-            font-weight: 600;
-        }
-
-        .done-btn {
-            background-color: #1e90ff;
-            color: #fff;
+        /* Full page video background with lower visibility */
+        #camera-feed {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.3;
+            /* Lower visibility for the camera feed */
+            z-index: 1;
+            /* Ensure camera feed is below other content */
         }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.4/html5-qrcode.min.js"
+        integrity="sha512-k/KAe4Yff9EUdYI5/IAHlwUswqeipP+Cp5qnrsUjTPCgl51La2/JhyyjNciztD7mWNKLSXci48m7cctATKfLlQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 
-<body>
-    <div class="container" id="contentToCapture">
-        <div class="success-icon">
-            <img src="../images/tick.png" alt="paymenticon" width="38%">
-            <!-- <svg xmlns="http://www.w3.org/2000/svg" width="130" height="130" viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="12" r="10" fill="#00BFFF" />
-                <path d="M9 12.5l2 2.5 4-5" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"
-                    stroke-linejoin="round" />
-            </svg> -->
+<body data-rsssl=1>
+    <video id="camera-feed" autoplay></video> <!-- Full page camera feed -->
 
+    <main>
+        <div id="reader">
+            <div class="corner top-left"></div>
+            <div class="corner top-right"></div>
+            <div class="corner bottom-left"></div>
+            <div class="corner bottom-right"></div>
         </div>
-        <p class="amount">₹<span id="amount"></span>.00</p>
-        <div class="payment-details">
-            <p class="paid-to">Paid to <span id="upiName">Paytm</span></p>
-            <p class="upi-id">UPI ID: <span id="upiId"></span></p>
-            <p class="date-time"><span id="dateTime"></span></p>
-            <p class="transaction-id">UPI transaction ID: <span id="transactionId"></span></p>
-        </div>
-        <div class="notification">
-            <div class="notification-content">
-                <!-- SVG for the UPI Lite icon -->
-                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path
-                        d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
-                        fill="orange" />
-                    <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77V2Z" fill="green" />
-                </svg>
-                <div class="notification-text">
-                    <p class="notification-title">UPI Lite balance low</p>
-                    <p class="notification-subtitle">Add money to your balance to continue paying PIN-free.</p>
-                    <a href="#" class="add-balance">Add balance</a>
-                </div>
-            </div>
-            <button class="close-btn">✕</button>
-        </div>
-        <div class="buttons">
-            <button class="share-btn">
-                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none">
-                    <circle cx="5" cy="12" r="2" fill="#87CEEB" />
-                    <circle cx="19" cy="5" r="2" fill="#87CEEB" />
-                    <circle cx="19" cy="19" r="2" fill="#87CEEB" />
-                    <line x1="6.8" y1="12" x2="17" y2="6.2" stroke="#87CEEB" stroke-width="2" />
-                    <line x1="6.8" y1="12" x2="17" y2="17.8" stroke="#87CEEB" stroke-width="2" />
-                </svg>
-                Share screenshot</button>
-            <button class="done-btn">Done</button>
-        </div>
-    </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+        <label class="upload-button" for="file-input">
+            <img src="https://img.icons8.com/ios-glyphs/30/ffffff/gallery.png" alt="Gallery Icon" /> Upload from gallery
+        </label>
+        <input type="file" id="file-input" accept="image/*" />
+        <div class="overlay-text">Scan any QR code to pay</div>
+    </main>
+
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const upiId = getCookie("upiId");
-            const Name = getCookie("name");
-            document.getElementById("upiName").innerText = Name;
-            document.getElementById("upiId").innerText = upiId;
+        const cameraFeed = document.getElementById('camera-feed');
+        
+        //Delete previous cookie if payment is initiated within 5 minutes.....
+        function eraseCookie(name) {
+            document.cookie = name + '=; Max-Age=-99999999; path=/';
+        }
+        eraseCookie("upiId");
+        eraseCookie("name");
 
-            //set amount
-            document.getElementById("amount").innerText=localStorage.getItem("amountInput");
-
-            // add random transaction id 
-            function generateRandomNumber() {
-                const min = 100000000000;
-                const max = 999999999999;
-                return Math.floor(Math.random() * (max - min + 1)) + min;
-            }
-            const randomNumber = generateRandomNumber();
-            document.getElementById("transactionId").innerText = randomNumber;
-        });
-
-        //add date time of the payment time
-        document.getElementById("dateTime").innerText = formatDateTime();
-        function formatDateTime() {
-            const now = new Date();
-
-            // Get the day, month, and year
-            const day = now.getDate();
-            const month = now.toLocaleString('default', { month: 'long' });
-            const year = now.getFullYear();
-
-            // Get the hours and minutes
-            let hours = now.getHours();
-            const minutes = now.getMinutes();
-
-            // Convert hours to 12-hour format and determine AM/PM
-            const amPm = hours >= 12 ? 'pm' : 'am';
-            hours = hours % 12 || 12;
-
-            // Format minutes to always be two digits
-            const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
-
-            // Construct the formatted date and time string
-            const formattedDateTime = `${day} ${month} ${year}, ${hours}:${formattedMinutes} ${amPm}`;
-
-            return formattedDateTime;
+        // Function to set up the camera feed
+        function startCamera() {
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+                .then(stream => {
+                    cameraFeed.srcObject = stream;
+                })
+                .catch(error => {
+                    console.error('Error accessing camera:', error);
+                });
         }
 
+        startCamera(); // Start camera feed
 
+        const scanner = new Html5QrcodeScanner('reader', {
+            fps: 20,
+            qrbox: { width: 250, height: 250 }, // QR code scanning area
+            rememberLastUsedCamera: true,
+            facingMode: { exact: "environment" }, // Use back camera by default
+            disableFlip: true, // Do not flip the image
+        }, false); // Disable UI controls
 
-        // script.js
-        document.querySelector('.close-btn').addEventListener('click', function () {
-            document.querySelector('.notification').style.display = 'none';
-        });
-        //done button
-        document.getElementsByClassName("done-btn")[0].addEventListener('click', () => {
-            window.location.href = "https://omkartechnical2006.github.io/GooglePay/";
-        });
-        //share button
-        document.getElementsByClassName("share-btn")[0].addEventListener('click', () => {
-            html2canvas(document.getElementById('contentToCapture')).then(canvas => {
-                // Convert the canvas to a data URL
-                const dataURL = canvas.toDataURL('image/png');
+        scanner.render(success, error);
 
-                //let's fetch the username by qr
-                const username = document.getElementById("upiName").innerText;
+        function success(result) {
+            // Function to parse the UPI URI and extract parameters
+            function getUpiParams(uri) {
+                // Create a URL object
+                const url = new URL(uri);
 
-                // Create a link element to download the image
-                const link = document.createElement('a');
-                link.href = dataURL;
-                link.download = `${username}_success.png`;
+                // Extract query parameters
+                const params = new URLSearchParams(url.search);
 
-                // Programmatically click the link to trigger the download
-                link.click();
-            });
-        });
+                // Get payee ID and name
+                const payeeId = params.get('pa');
+                const payeeName = params.get('pn');
 
-        //get cookie function
-        function getCookie(name) {
-            const nameEQ = name + "=";
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                let cookie = cookies[i];
-                while (cookie.charAt(0) === ' ') cookie = cookie.substring(1);
-                if (cookie.indexOf(nameEQ) === 0) return cookie.substring(nameEQ.length, cookie.length);
+                return {
+                    payeeId: payeeId,
+                    payeeName: payeeName
+                };
             }
-            return null;
+
+            // Example UPI URI
+            const upiUri = result;
+            // Fetch and log the parameters
+            const params = getUpiParams(upiUri);
+            setCookie("upiId", params.payeeId, 5);
+            setCookie("name", params.payeeName, 5);
+            window.location.href = "moneyask.html"
+        }
+
+        function error(err) {
+            console.error(err);
+        }
+
+        // Handle file input (gallery upload)
+        document.getElementById('file-input').addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const html5QrCode = new Html5Qrcode("reader");
+            html5QrCode.scanFile(file, true)
+                .then(decodedText => {
+                    success(decodedText);
+                })
+                .catch(errorMessage => {
+                    error(errorMessage);
+                });
+        });
+        // Function to set cookie 
+        function setCookie(name, value, minutes) {
+            let expires = "";
+            if (minutes) {
+                const date = new Date();
+                date.setTime(date.getTime() + (minutes * 60 * 1000)); // Convert minutes to milliseconds
+                expires = "; expires=" + date.toUTCString();
+            }
+            document.cookie = name + "=" + (value || "") + expires + "; path=/";
         }
     </script>
 </body>
