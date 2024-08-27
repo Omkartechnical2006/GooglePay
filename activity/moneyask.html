@@ -78,8 +78,6 @@
             text-align: center;
             padding: 10px;
             outline: none;
-            -moz-appearance: textfield;
-            /* Hide spinner for Firefox */
         }
 
         /* Hide arrows in input number */
@@ -131,7 +129,7 @@
             background-color: #007bff;
             color: white;
             padding: 15px;
-            border-radius: 50%;
+            border-radius: 15px;
             border: none;
             font-size: 24px;
             cursor: pointer;
@@ -174,7 +172,7 @@
            function sendAmount() {
             const amount = document.getElementById('amountInput').value;
             if (amount) {
-                console.log(`Sending ₹${amount}`);
+                alert(`Sending ₹${amount}`);
                 setTimeout(function () {
                     window.location.href = 'animation'; // Replace with the URL you want to redirect to
                 }, 1500);
